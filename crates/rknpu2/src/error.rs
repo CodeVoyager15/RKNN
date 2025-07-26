@@ -1,3 +1,5 @@
+use rknpu2_sys::_rknn_tensor_type;
+
 #[derive(Debug)]
 pub enum Error {
     /// Execution error
@@ -26,6 +28,14 @@ pub enum Error {
     /// RKNN model isn't compatible with the target platform
     TargetPlatformUnmatch,
     IncompatiblePreCompiledModel,
+    TensorTypeMismatch {
+        expected: _rknn_tensor_type::Type,
+        actual: _rknn_tensor_type::Type,
+    },
+    SizeMismatch {
+        expected: usize,
+        actual: usize,
+    },
 }
 
 impl std::error::Error for Error {}
@@ -53,6 +63,16 @@ impl std::fmt::Display for Error {
             ),
             Error::TargetPlatformUnmatch => {
                 write!(f, "RKNN model isn't compatible with the target platform")
+            }
+            Error::TensorTypeMismatch { expected, actual } => {
+                write!(
+                    f,
+                    "Tensor type mismatch: expected {:?}, actual {:?}",
+                    expected, actual
+                )
+            }
+            Error::SizeMismatch { expected, actual } => {
+                write!(f, "Size mismatch: expected {}, actual {}", expected, actual)
             }
         }
     }
