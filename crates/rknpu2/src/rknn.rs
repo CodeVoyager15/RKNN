@@ -65,3 +65,11 @@ impl RKNN {
         unsafe { Ok(result.assume_init().into()) }
     }
 }
+
+impl Drop for RKNN {
+    fn drop(&mut self) {
+        unsafe {
+            rknpu2_sys::rknn_destroy(self.ctx);
+        }
+    }
+}
