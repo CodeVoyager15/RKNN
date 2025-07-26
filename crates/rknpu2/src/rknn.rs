@@ -1,3 +1,8 @@
+#[cfg(any(feature = "rk3576", feature = "rk35xx"))]
+use crate::{
+    query::InputOutputNum,
+    tensor::{TensorType, builder::TensorBuilder, tensor::Tensor},
+};
 use {
     crate::{
         Error,
@@ -63,6 +68,61 @@ impl RKNN {
             return Err(ret.into());
         }
         unsafe { Ok(result.assume_init().into()) }
+    }
+
+    pub fn run(&self) -> Result<(), Error> {
+        let ret = unsafe { rknpu2_sys::rknn_run(self.ctx, ptr::null_mut()) };
+        if ret != 0 {
+            return Err(ret.into());
+        }
+        Ok(())
+    }
+
+    #[cfg(any(feature = "rk3576", feature = "rk35xx"))]
+    pub fn set_inputs<T: TensorType>(&self, tensors: &[Tensor<T>]) -> Result<(), Error> {
+        let mut ffi_inputs: Vec<rknpu2_sys::rknn_input> =
+            tensors.iter().map(|t| t.as_input()).collect();
+
+        let ret = unsafe {
+            rknpu2_sys::rknn_inputs_set(self.ctx, ffi_inputs.len() as u32, ffi_inputs.as_mut_ptr())
+        };
+
+        if ret != 0 {
+            return Err(ret.into());
+        }
+
+        Ok(())
+    }
+
+    #[cfg(any(feature = "rk3576", feature = "rk35xx"))]
+    pub fn get_outputs<T: TensorType + Copy>(&self) -> Result<Vec<Tensor<T>>, Error> {
+        let mut outputs = Vec::new();
+        let num = self.query::<InputOutputNum>()?;
+        for i in 0..num.output_num() {
+            let output = TensorBuilder::new_output(&self, i).allocate()?;
+
+            outputs.push(output);
+        }
+
+        let mut outputs_ffi = outputs
+            .iter_mut()
+            .map(|t| t.as_output())
+            .collect::<Vec<_>>();
+
+        let ret = unsafe {
+            rknpu2_sys::rknn_outputs_get(
+                self.ctx,
+                outputs_ffi.len() as u32,
+                outputs_ffi.as_mut_ptr(),
+                std::ptr::null_mut(),
+            )
+        };
+
+        if ret != 0 {
+            return Err(ret.into());
+        }
+
+        Ok(outputs)
     }
 }
 

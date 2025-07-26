@@ -1,17 +1,21 @@
-use rknpu2_sys::{
-    _rknn_tensor_format::{
-        self, RKNN_TENSOR_FORMAT_MAX, RKNN_TENSOR_NC1HWC2, RKNN_TENSOR_NCHW, RKNN_TENSOR_NHWC,
-        RKNN_TENSOR_UNDEFINED,
-    },
-    _rknn_tensor_qnt_type,
-    _rknn_tensor_type::{
-        self, RKNN_TENSOR_BFLOAT16, RKNN_TENSOR_BOOL, RKNN_TENSOR_FLOAT16, RKNN_TENSOR_FLOAT32,
-        RKNN_TENSOR_INT4, RKNN_TENSOR_INT8, RKNN_TENSOR_INT16, RKNN_TENSOR_INT32,
-        RKNN_TENSOR_INT64, RKNN_TENSOR_TYPE_MAX, RKNN_TENSOR_UINT8, RKNN_TENSOR_UINT16,
-        RKNN_TENSOR_UINT32,
+use {
+    half::f16,
+    rknpu2_sys::{
+        _rknn_tensor_format::{
+            self, RKNN_TENSOR_FORMAT_MAX, RKNN_TENSOR_NC1HWC2, RKNN_TENSOR_NCHW, RKNN_TENSOR_NHWC,
+            RKNN_TENSOR_UNDEFINED,
+        },
+        _rknn_tensor_qnt_type,
+        _rknn_tensor_type::{
+            self, RKNN_TENSOR_BFLOAT16, RKNN_TENSOR_BOOL, RKNN_TENSOR_FLOAT16, RKNN_TENSOR_FLOAT32,
+            RKNN_TENSOR_INT4, RKNN_TENSOR_INT8, RKNN_TENSOR_INT16, RKNN_TENSOR_INT32,
+            RKNN_TENSOR_INT64, RKNN_TENSOR_TYPE_MAX, RKNN_TENSOR_UINT8, RKNN_TENSOR_UINT16,
+            RKNN_TENSOR_UINT32,
+        },
     },
 };
 
+pub mod builder;
 pub mod tensor;
 
 #[derive(Debug)]
@@ -182,25 +186,22 @@ impl From<_rknn_tensor_qnt_type::Type> for QuantTypeKind {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub enum TensorLayout {
-    NHWC,
-    NC1HWC2,
-    Unknown,
-}
-
-#[derive(Debug, Clone, Copy)]
 pub struct StrideInfo {
     pub w_stride: u32,
     pub h_stride: u32,
     pub size_with_stride: u32,
 }
 
-pub trait TensorType: Sized {
+pub trait TensorType: Sized + Default {
     const TYPE: _rknn_tensor_type::Type;
 }
 
 impl TensorType for f32 {
     const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_FLOAT32;
+}
+
+impl TensorType for f16 {
+    const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_FLOAT16;
 }
 
 impl TensorType for u8 {

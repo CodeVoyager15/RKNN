@@ -1,7 +1,7 @@
 use {
     crate::{
         Error,
-        tensor::{StrideInfo, TensorLayout, TensorType},
+        tensor::{StrideInfo, TensorFormatKind, TensorType},
     },
     std::{marker::PhantomData, ptr::NonNull},
 };
@@ -10,26 +10,29 @@ use {
 pub struct Tensor<T> {
     ptr: NonNull<T>,
     len: usize,
-    _layout: TensorLayout,
+    _layout: TensorFormatKind,
     fmt: rknpu2_sys::rknn_tensor_format,
     index: u32,
     pass_through: bool,
     _stride_info: Option<StrideInfo>,
     _marker: PhantomData<T>,
+    _buffer: Option<Box<[T]>>,
 }
 
 impl<T> Tensor<T> {
-    pub unsafe fn from_raw_parts(
+    pub(crate) unsafe fn from_raw_parts(
         ptr: *mut T,
         len: usize,
         index: u32,
-        layout: TensorLayout,
+        layout: TensorFormatKind,
         fmt: rknpu2_sys::rknn_tensor_format,
         pass_through: bool,
         stride_info: Option<StrideInfo>,
+        buffer: Option<Box<[T]>>,
     ) -> Self {
         Self {
-            ptr: NonNull::new(ptr).expect("Tensor pointer cannot be null"),
+            ptr: NonNull::new(ptr)
+                .expect("Tensor::from_raw_parts got null pointer when creating Tensor"),
             len,
             _layout: layout,
             fmt,
@@ -37,6 +40,7 @@ impl<T> Tensor<T> {
             pass_through,
             _stride_info: stride_info,
             _marker: PhantomData,
+            _buffer: buffer,
         }
     }
 
@@ -77,7 +81,7 @@ impl<T> Tensor<T> {
         self.as_mut_slice().fill(value);
     }
 
-    pub fn as_input(&self) -> rknpu2_sys::rknn_input
+    pub(crate) fn as_input(&self) -> rknpu2_sys::rknn_input
     where
         T: TensorType,
     {
@@ -91,7 +95,7 @@ impl<T> Tensor<T> {
         }
     }
 
-    pub fn as_output(&mut self) -> rknpu2_sys::rknn_output
+    pub(crate) fn as_output(&mut self) -> rknpu2_sys::rknn_output
     where
         T: TensorType,
     {
