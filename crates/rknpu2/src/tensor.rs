@@ -12,6 +12,8 @@ use rknpu2_sys::{
     },
 };
 
+pub mod tensor;
+
 #[derive(Debug)]
 pub struct TensorFormat;
 
@@ -177,4 +179,38 @@ impl From<_rknn_tensor_qnt_type::Type> for QuantTypeKind {
             _ => QuantTypeKind::Other(quant_type),
         }
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum TensorLayout {
+    NHWC,
+    NC1HWC2,
+    Unknown,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct StrideInfo {
+    pub w_stride: u32,
+    pub h_stride: u32,
+    pub size_with_stride: u32,
+}
+
+pub trait TensorType: Sized {
+    const TYPE: _rknn_tensor_type::Type;
+}
+
+impl TensorType for f32 {
+    const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_FLOAT32;
+}
+
+impl TensorType for u8 {
+    const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_UINT8;
+}
+
+impl TensorType for i8 {
+    const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_INT8;
+}
+
+impl TensorType for i32 {
+    const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_INT32;
 }
