@@ -1,0 +1,39 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    build:
+        name: Build with ${{ matrix.toolchain }}
+        runs-on: ubuntu-24.04-arm
+        strategy:
+            matrix:
+                toolchain: [stable, nightly]
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Rust ${{ matrix.toolchain }}
+              uses: actions/setup-rust@v1
+              with:
+                  rust-version: ${{ matrix.toolchain }}
+
+            - name: Cache cargo registry
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.cargo/registry
+                      ~/.cargo/git
+                  key: ${{ runner.os }}-cargo-${{ matrix.toolchain }}-${{ hashFiles('**/Cargo.lock') }}
+
+            - name: Cargo build
+              run: cargo build --verbose
+
+            - name: Cargo doc (nightly only)
+              if: matrix.toolchain == 'nightly'
+              run: cargo doc --features docs --no-deps
