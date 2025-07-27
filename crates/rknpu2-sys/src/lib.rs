@@ -7,8 +7,10 @@ mod api;
 #[allow(unsafe_op_in_unsafe_fn)]
 #[allow(non_snake_case)]
 #[cfg(feature = "libloading")]
+#[cfg_attr(feature = "docs", doc(cfg(feature = "libloading")))]
 mod rt;
 
 pub use api::*;
 #[cfg(feature = "libloading")]
+#[cfg_attr(feature = "docs", doc(cfg(feature = "libloading")))]
 pub use rt::*;

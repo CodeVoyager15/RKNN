@@ -7,7 +7,6 @@
 ### Documentation
 
 - Most docstrings are missing
-- I should use cfg_attr(feature = "docs", doc(cfg(feature = "..."))) on all the feature gates in the high-level bindings.
 
 ### Testing
 

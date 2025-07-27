@@ -79,6 +79,10 @@ impl RKNN {
     }
 
     #[cfg(any(feature = "rk3576", feature = "rk35xx"))]
+    #[cfg_attr(
+        feature = "docs",
+        doc(cfg(any(feature = "rk35xx", feature = "rk3576")))
+    )]
     pub fn set_inputs<T: TensorType>(&self, tensors: &[Tensor<T>]) -> Result<(), Error> {
         let mut ffi_inputs: Vec<rknpu2_sys::rknn_input> =
             tensors.iter().map(|t| t.as_input()).collect();
@@ -95,6 +99,10 @@ impl RKNN {
     }
 
     #[cfg(any(feature = "rk3576", feature = "rk35xx"))]
+    #[cfg_attr(
+        feature = "docs",
+        doc(cfg(any(feature = "rk35xx", feature = "rk3576")))
+    )]
     pub fn get_outputs<T: TensorType + Copy>(&self) -> Result<Vec<Tensor<T>>, Error> {
         let mut outputs = Vec::new();
         let num = self.query::<InputOutputNum>()?;
