@@ -2,8 +2,8 @@
 name = "rknpu2-sys"
 version = "0.0.1"
 edition = "2024"
-description = "Unofficial bindings to rknn-toolkit2 (librknnrt and librknnmrt)"
-repository = "https://github.com/boydjohnson/rknpu2-rs"
+description = "Unofficial bindings to rknpu2 (librknnrt and librknnmrt)"
+repository = "https://github.com/boundarybitlabs/rknpu2-rs"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
