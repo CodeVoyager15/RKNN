@@ -11,7 +11,7 @@ half = "2.6.0"
 rknpu2-sys = { path = "../rknpu2-sys" }
 
 [features]
-default = ["libloading"]
+default = []
 
 rv110x = ["rknpu2-sys/rv110x"] # For RV1103 / RV1106 / B variants
 rk2118 = ["rknpu2-sys/rk2118"] # For RK2118
