@@ -21,11 +21,13 @@ fn test_run() {
 
 #[cfg(any(feature = "rk3576", feature = "rk35xx"))]
 #[test]
-fn test_perf_run() {
-    use rknpu2::query::PerfRun;
-
+fn test_perf_detail() {
+    use {
+        rknpu2::query::{PerfDetail, PerfRun},
+        rknpu2_sys::RKNN_FLAG_COLLECT_PERF_MASK,
+    };
     let mut model_data = MODEL_DATA.to_vec();
-    let model = RKNN::new(&mut model_data, 0).unwrap();
+    let model = RKNN::new(&mut model_data, RKNN_FLAG_COLLECT_PERF_MASK).unwrap();
 
     let mut input = TensorBuilder::new_input(&model, 0)
         .allocate::<i8>()
@@ -39,4 +41,7 @@ fn test_perf_run() {
 
     let perf_run = model.query::<PerfRun>().unwrap();
     assert!(perf_run.run_duration() > 0);
+
+    let perf_detail = model.query::<PerfDetail>().unwrap();
+    assert!(perf_detail.details().len() > 0);
 }
