@@ -1,4 +1,5 @@
 #![cfg_attr(feature = "docs", feature(doc_cfg))]
+#![allow(unused_imports)]
 
 #[allow(non_camel_case_types)]
 #[allow(non_snake_case)]
@@ -14,3 +15,12 @@ pub use api::*;
 #[cfg(feature = "libloading")]
 #[cfg_attr(feature = "docs", doc(cfg(feature = "libloading")))]
 pub use rt::*;
+
+#[cfg(not(feature = "libloading"))]
+pub use api::functions::*;
+
+#[cfg(not(feature = "libloading"))]
+pub use api::functions_custom_ops::*;
+
+#[cfg(not(feature = "libloading"))]
+pub use api::functions_matmul::*;
