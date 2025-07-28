@@ -6,3 +6,6 @@ pub mod rknn;
 pub mod tensor;
 
 pub use {error::Error, rknn::RKNN};
+
+#[allow(non_snake_case)]
+pub mod api;

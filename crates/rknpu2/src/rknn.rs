@@ -1,3 +1,5 @@
+use rknpu2_sys::rknn_context;
+
 #[cfg(any(feature = "rk3576", feature = "rk35xx"))]
 use crate::{
     query::InputOutputNum,
@@ -6,43 +8,27 @@ use crate::{
 use {
     crate::{
         Error,
+        api::RKNNAPI,
         query::{Query, QueryWithInput},
     },
-    rknpu2_sys::{rknn_context, rknn_init},
     std::{ffi::c_void, ptr},
 };
 
-pub struct RKNN {
+pub struct RKNN<A: RKNNAPI> {
     pub(crate) ctx: rknn_context,
+    pub(crate) api: A,
 }
 
-impl RKNN {
-    pub fn new(model_data: &mut [u8], flags: u32) -> Result<Self, Error> {
-        let mut ctx: rknn_context = 0;
-        let ret = unsafe {
-            rknn_init(
-                &mut ctx as *mut _,
-                model_data.as_mut_ptr() as *mut c_void,
-                model_data.len() as u32,
-                flags,
-                ptr::null_mut(),
-            )
-        };
-        if ret != 0 {
-            return Err(ret.into());
-        }
-        Ok(Self { ctx })
-    }
-
+impl<A: RKNNAPI> RKNN<A> {
     pub fn query<T: Query>(&self) -> Result<T, Error> {
         let mut result = std::mem::MaybeUninit::<T::Output>::uninit();
         let ret = unsafe {
-            rknpu2_sys::rknn_query(
+            self.api.query(
                 self.ctx,
                 T::QUERY_TYPE,
                 &mut result as *mut _ as *mut c_void,
                 std::mem::size_of::<T::Output>() as u32,
-            )
+            )?
         };
         if ret != 0 {
             return Err(ret.into());
@@ -57,12 +43,12 @@ impl RKNN {
         T::prepare(input, unsafe { &mut *result.as_mut_ptr() });
 
         let ret = unsafe {
-            rknpu2_sys::rknn_query(
+            self.api.query(
                 self.ctx,
                 T::QUERY_TYPE,
                 result.as_mut_ptr() as *mut _ as *mut c_void,
                 std::mem::size_of::<T::Output>() as u32,
-            )
+            )?
         };
         if ret != 0 {
             return Err(ret.into());
@@ -71,7 +57,7 @@ impl RKNN {
     }
 
     pub fn run(&self) -> Result<(), Error> {
-        let ret = unsafe { rknpu2_sys::rknn_run(self.ctx, ptr::null_mut()) };
+        let ret = unsafe { self.api.run(self.ctx, ptr::null_mut())? };
         if ret != 0 {
             return Err(ret.into());
         }
@@ -88,7 +74,8 @@ impl RKNN {
             tensors.iter().map(|t| t.as_input()).collect();
 
         let ret = unsafe {
-            rknpu2_sys::rknn_inputs_set(self.ctx, ffi_inputs.len() as u32, ffi_inputs.as_mut_ptr())
+            self.api
+                .inputs_set(self.ctx, ffi_inputs.len() as u32, ffi_inputs.as_mut_ptr())?
         };
 
         if ret != 0 {
@@ -118,12 +105,12 @@ impl RKNN {
             .collect::<Vec<_>>();
 
         let ret = unsafe {
-            rknpu2_sys::rknn_outputs_get(
+            self.api.outputs_get(
                 self.ctx,
                 outputs_ffi.len() as u32,
                 outputs_ffi.as_mut_ptr(),
                 std::ptr::null_mut(),
-            )
+            )?
         };
 
         if ret != 0 {
@@ -134,10 +121,10 @@ impl RKNN {
     }
 }
 
-impl Drop for RKNN {
+impl<A: RKNNAPI> Drop for RKNN<A> {
     fn drop(&mut self) {
         unsafe {
-            rknpu2_sys::rknn_destroy(self.ctx);
+            self.api.destroy(self.ctx).unwrap();
         }
     }
 }

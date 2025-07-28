@@ -2,11 +2,30 @@ use rknpu2::{RKNN, tensor::builder::TensorBuilder};
 
 static MODEL_DATA: &[u8] = include_bytes!("./fixtures/mobilenet_v2.rknn");
 
+#[cfg(not(feature = "libloading"))]
+use rknpu2::api::linked::LinkedAPI;
+
+#[cfg(not(feature = "libloading"))]
+fn get_rknn(flag: u32) -> RKNN<LinkedAPI> {
+    let mut model_data = MODEL_DATA.to_vec();
+    let rknn = RKNN::new(&mut model_data, flag).unwrap();
+    rknn
+}
+
+#[cfg(feature = "libloading")]
+use rknpu2::api::runtime::RuntimeAPI;
+
+#[cfg(feature = "libloading")]
+fn get_rknn(flag: u32) -> RKNN<RuntimeAPI> {
+    let mut model_data = MODEL_DATA.to_vec();
+    let rknn = RKNN::new_with_library("/usr/lib/librknnrt.so", &mut model_data, flag).unwrap();
+    rknn
+}
+
 #[cfg(any(feature = "rk3576", feature = "rk35xx"))]
 #[test]
 fn test_run() {
-    let mut model_data = MODEL_DATA.to_vec();
-    let model = RKNN::new(&mut model_data, 0).unwrap();
+    let model = get_rknn(0);
 
     let mut input = TensorBuilder::new_input(&model, 0)
         .allocate::<i8>()
@@ -26,8 +45,8 @@ fn test_perf_detail() {
         rknpu2::query::{PerfDetail, PerfRun},
         rknpu2_sys::RKNN_FLAG_COLLECT_PERF_MASK,
     };
-    let mut model_data = MODEL_DATA.to_vec();
-    let model = RKNN::new(&mut model_data, RKNN_FLAG_COLLECT_PERF_MASK).unwrap();
+
+    let model = get_rknn(RKNN_FLAG_COLLECT_PERF_MASK);
 
     let mut input = TensorBuilder::new_input(&model, 0)
         .allocate::<i8>()

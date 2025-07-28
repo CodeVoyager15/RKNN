@@ -1,11 +1,12 @@
 use crate::{
     Error, RKNN,
+    api::RKNNAPI,
     query::{InputAttr, output_attr::OutputAttr},
     tensor::{StrideInfo, TensorType, tensor::Tensor},
 };
 
-pub struct TensorBuilder<'a> {
-    model: &'a RKNN,
+pub struct TensorBuilder<'a, A: RKNNAPI> {
+    model: &'a RKNN<A>,
     index: u32,
     kind: TensorKind,
 }
@@ -16,8 +17,8 @@ pub enum TensorKind {
     Output,
 }
 
-impl<'a> TensorBuilder<'a> {
-    pub fn new_input(model: &'a RKNN, index: u32) -> Self {
+impl<'a, A: RKNNAPI> TensorBuilder<'a, A> {
+    pub fn new_input(model: &'a RKNN<A>, index: u32) -> Self {
         Self {
             model,
             index,
@@ -25,7 +26,7 @@ impl<'a> TensorBuilder<'a> {
         }
     }
 
-    pub fn new_output(model: &'a RKNN, index: u32) -> Self {
+    pub fn new_output(model: &'a RKNN<A>, index: u32) -> Self {
         Self {
             model,
             index,
