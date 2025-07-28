@@ -6,10 +6,30 @@ use rknpu2::{
 
 static MODEL_DATA: &[u8] = include_bytes!("./fixtures/mobilenet_v2.rknn");
 
-#[test]
-fn test_input_output_num() {
+#[cfg(not(feature = "libloading"))]
+use rknpu2::api::linked::LinkedAPI;
+
+#[cfg(not(feature = "libloading"))]
+fn get_rknn() -> RKNN<LinkedAPI> {
     let mut model_data = MODEL_DATA.to_vec();
     let rknn = RKNN::new(&mut model_data, 0).unwrap();
+    rknn
+}
+
+#[cfg(feature = "libloading")]
+use rknpu2::api::runtime::RuntimeAPI;
+
+#[cfg(feature = "libloading")]
+fn get_rknn() -> RKNN<RuntimeAPI> {
+    let mut model_data = MODEL_DATA.to_vec();
+    let rknn = RKNN::new_with_library("/usr/lib/librknnrt.so", &mut model_data, 0).unwrap();
+    rknn
+}
+
+#[test]
+fn test_input_output_num() {
+    let rknn = get_rknn();
+
     let io_num = rknn.query::<InputOutputNum>().unwrap();
 
     assert_eq!(io_num.input_num(), 1);
@@ -18,8 +38,7 @@ fn test_input_output_num() {
 
 #[test]
 fn test_sdk_version() {
-    let mut model_data = MODEL_DATA.to_vec();
-    let rknn = RKNN::new(&mut model_data, 0).unwrap();
+    let rknn = get_rknn();
     let sdk_version = rknn.query::<SdkVersion>().unwrap();
 
     assert!(!sdk_version.api_version().is_empty());
@@ -28,8 +47,7 @@ fn test_sdk_version() {
 
 #[test]
 fn test_input_attr() {
-    let mut model_data = MODEL_DATA.to_vec();
-    let rknn = RKNN::new(&mut model_data, 0).unwrap();
+    let rknn = get_rknn();
     let input_attr = rknn.query_with_input::<InputAttr>(0).unwrap();
 
     assert_eq!(input_attr.dims(), &[1, 224, 224, 3]);
@@ -39,8 +57,7 @@ fn test_input_attr() {
 
 #[test]
 fn test_output_attr() {
-    let mut model_data = MODEL_DATA.to_vec();
-    let rknn = RKNN::new(&mut model_data, 0).unwrap();
+    let rknn = get_rknn();
     let output_attr = rknn.query_with_input::<OutputAttr>(0).unwrap();
 
     assert_eq!(output_attr.dims(), &[1, 1000]);
