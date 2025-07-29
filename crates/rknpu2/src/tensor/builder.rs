@@ -5,19 +5,24 @@ use crate::{
     tensor::{StrideInfo, TensorType, tensor::Tensor},
 };
 
+/// TensorBuilder is a helper struct for creating tensors.
 pub struct TensorBuilder<'a, A: RKNNAPI> {
     model: &'a RKNN<A>,
     index: u32,
     kind: TensorKind,
 }
 
+/// The kind of tensor.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TensorKind {
+    /// Input tensor.
     Input,
+    /// Output tensor.
     Output,
 }
 
 impl<'a, A: RKNNAPI> TensorBuilder<'a, A> {
+    /// Builds a new input tensor.
     pub fn new_input(model: &'a RKNN<A>, index: u32) -> Self {
         Self {
             model,
@@ -26,6 +31,7 @@ impl<'a, A: RKNNAPI> TensorBuilder<'a, A> {
         }
     }
 
+    /// Builds a new output tensor.
     pub fn new_output(model: &'a RKNN<A>, index: u32) -> Self {
         Self {
             model,

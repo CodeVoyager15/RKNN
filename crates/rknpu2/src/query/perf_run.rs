@@ -1,3 +1,4 @@
+/// Model inference duration.
 use rknpu2_sys::{_rknn_query_cmd, rknn_perf_run};
 
 use crate::query::Query;

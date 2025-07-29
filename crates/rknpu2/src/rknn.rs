@@ -14,6 +14,7 @@ use {
     std::{ffi::c_void, ptr},
 };
 
+/// Main rknn struct with ability to query the model and run inference.
 pub struct RKNN<A: RKNNAPI> {
     pub(crate) ctx: rknn_context,
     pub(crate) api: A,

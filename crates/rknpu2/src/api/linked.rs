@@ -1,9 +1,10 @@
-use std::{ffi::c_void, ptr};
+use {
+    crate::{Error, RKNN, api::RKNNAPI},
+    rknpu2_sys::rknn_context,
+    std::{ffi::c_void, ptr},
+};
 
-use rknpu2_sys::rknn_context;
-
-use crate::{Error, RKNN, api::RKNNAPI};
-
+/// Trait used for linked
 pub struct LinkedAPI;
 
 impl RKNNAPI for LinkedAPI {

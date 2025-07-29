@@ -1,3 +1,4 @@
+/// Query types for the query associated function.
 use rknpu2_sys::_rknn_query_cmd::Type;
 
 pub trait Query: From<Self::Output> + Sized {
