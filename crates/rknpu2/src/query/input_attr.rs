@@ -7,6 +7,7 @@ use {
         _rknn_query_cmd::{RKNN_QUERY_INPUT_ATTR, Type},
         rknn_tensor_attr,
     },
+    std::ffi::CStr,
 };
 
 /// Query a specific input's attributes.
@@ -28,7 +29,8 @@ impl InputAttr {
     }
 
     pub fn name(&self) -> String {
-        String::from_utf8_lossy(&self.inner.name).into_owned()
+        let cstr = unsafe { CStr::from_ptr(self.inner.name.as_ptr()) };
+        cstr.to_string_lossy().into_owned()
     }
 
     pub fn num_elements(&self) -> u32 {

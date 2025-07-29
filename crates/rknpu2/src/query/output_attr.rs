@@ -1,9 +1,11 @@
+/// Model output attributes.
 use {
     crate::{
         query::QueryWithInput,
         tensor::{DataTypeKind, QuantTypeKind, TensorFormatKind},
     },
     rknpu2_sys::rknn_tensor_attr,
+    std::ffi::CStr,
 };
 
 pub struct OutputAttr {
@@ -42,7 +44,8 @@ impl OutputAttr {
     }
 
     pub fn name(&self) -> String {
-        String::from_utf8_lossy(&self.inner.name).into_owned()
+        let cstr = unsafe { CStr::from_ptr(self.inner.name.as_ptr()) };
+        cstr.to_string_lossy().into_owned()
     }
 
     pub fn num_elements(&self) -> u32 {
