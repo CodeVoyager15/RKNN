@@ -1,3 +1,6 @@
+use std::ffi::CStr;
+
+/// Sdk and driver version information.
 use rknpu2_sys::{
     _rknn_query_cmd::{RKNN_QUERY_SDK_VERSION, Type},
     rknn_sdk_version,
@@ -11,11 +14,13 @@ pub struct SdkVersion {
 
 impl SdkVersion {
     pub fn api_version(&self) -> String {
-        String::from_utf8_lossy(&self.inner.api_version).into_owned()
+        let cstr = unsafe { CStr::from_ptr(self.inner.api_version.as_ptr()) };
+        cstr.to_string_lossy().into_owned()
     }
 
     pub fn driver_version(&self) -> String {
-        String::from_utf8_lossy(&self.inner.drv_version).into_owned()
+        let cstr = unsafe { CStr::from_ptr(self.inner.api_version.as_ptr()) };
+        cstr.to_string_lossy().into_owned()
     }
 }
 

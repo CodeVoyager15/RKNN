@@ -19,11 +19,5 @@ rk35xx = ["rknpu2-sys/rk35xx"] # For RK356x / RV1126B
 rk3576 = [
     "rknpu2-sys/rk3576",
 ] # For RK3576 / RK3588 with full multi-core support
-docs = [
-    "rv110x",
-    "rk2118",
-    "rk35xx",
-    "rk3576",
-    "libloading",
-] # Requires nightly compiler
+docs = ["rv110x", "rk2118", "rk35xx", "rk3576"] # Requires nightly compiler
 libloading = ["rknpu2-sys/libloading"]
