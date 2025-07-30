@@ -1,6 +1,6 @@
 /// Tensor types, tensors, and utilities
 use {
-    half::f16,
+    half::{bf16, f16},
     rknpu2_sys::{
         _rknn_tensor_format::{
             self, RKNN_TENSOR_FORMAT_MAX, RKNN_TENSOR_NC1HWC2, RKNN_TENSOR_NCHW, RKNN_TENSOR_NHWC,
@@ -205,6 +205,10 @@ impl TensorType for f16 {
     const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_FLOAT16;
 }
 
+impl TensorType for bf16 {
+    const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_BFLOAT16;
+}
+
 impl TensorType for u8 {
     const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_UINT8;
 }
@@ -215,4 +219,20 @@ impl TensorType for i8 {
 
 impl TensorType for i32 {
     const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_INT32;
+}
+
+impl TensorType for u32 {
+    const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_UINT32;
+}
+
+impl TensorType for i16 {
+    const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_INT16;
+}
+
+impl TensorType for u16 {
+    const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_UINT16;
+}
+
+impl TensorType for i64 {
+    const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_INT64;
 }
