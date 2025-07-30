@@ -1,3 +1,5 @@
+/// Trait for RKNN API operations.
+
 #[cfg(any(feature = "rk35xx", feature = "rk3576"))]
 use rknpu2_sys::{
     rknn_core_mask, rknn_custom_op, rknn_custom_op_attr, rknn_custom_op_context, rknn_input,

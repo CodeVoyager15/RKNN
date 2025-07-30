@@ -8,18 +8,21 @@ use rknpu2_sys::{
 
 use crate::query::Query;
 
+/// Query the SDK and driver version information.
 pub struct SdkVersion {
     pub(crate) inner: rknn_sdk_version,
 }
 
 impl SdkVersion {
+    /// The SDK version.
     pub fn api_version(&self) -> String {
         let cstr = unsafe { CStr::from_ptr(self.inner.api_version.as_ptr()) };
         cstr.to_string_lossy().into_owned()
     }
 
+    /// The driver version.
     pub fn driver_version(&self) -> String {
-        let cstr = unsafe { CStr::from_ptr(self.inner.api_version.as_ptr()) };
+        let cstr = unsafe { CStr::from_ptr(self.inner.drv_version.as_ptr()) };
         cstr.to_string_lossy().into_owned()
     }
 }

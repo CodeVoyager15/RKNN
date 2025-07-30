@@ -1,5 +1,6 @@
 #![cfg_attr(feature = "docs", feature(doc_cfg))]
 #![allow(unused_imports)]
+#![doc = include_str!("../README.md")]
 
 #[allow(non_camel_case_types)]
 #[allow(non_snake_case)]

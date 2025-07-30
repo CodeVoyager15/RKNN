@@ -1,3 +1,4 @@
+/// Error type
 use rknpu2_sys::_rknn_tensor_type;
 
 #[derive(Debug)]

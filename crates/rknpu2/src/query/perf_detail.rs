@@ -1,3 +1,4 @@
+/// Model inference performance details.
 use {
     crate::query::Query,
     rknpu2_sys::{_rknn_query_cmd, rknn_perf_detail},

@@ -6,6 +6,7 @@ use {
     std::{marker::PhantomData, ptr::NonNull},
 };
 
+/// An input or output tensor of type T.
 #[derive(Debug)]
 pub struct Tensor<T> {
     ptr: NonNull<T>,
