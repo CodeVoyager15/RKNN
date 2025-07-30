@@ -1,3 +1,5 @@
+#[cfg(feature = "libloading")]
+use rknpu2::utils;
 use rknpu2::{
     RKNN,
     query::{InputAttr, InputOutputNum, SdkVersion, output_attr::OutputAttr},
@@ -22,7 +24,14 @@ use rknpu2::api::runtime::RuntimeAPI;
 #[cfg(feature = "libloading")]
 fn get_rknn() -> RKNN<RuntimeAPI> {
     let mut model_data = MODEL_DATA.to_vec();
-    let rknn = RKNN::new_with_library("/usr/lib/librknnrt.so", &mut model_data, 0).unwrap();
+    let rknn = RKNN::new_with_library(
+        utils::find_rknn_library()
+            .next()
+            .expect("No RKNN library found. Please install librknnrt.so."),
+        &mut model_data,
+        0,
+    )
+    .unwrap();
     rknn
 }
 

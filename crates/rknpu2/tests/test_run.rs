@@ -17,8 +17,17 @@ use rknpu2::api::runtime::RuntimeAPI;
 
 #[cfg(feature = "libloading")]
 fn get_rknn(flag: u32) -> RKNN<RuntimeAPI> {
+    use rknpu2::utils;
+
     let mut model_data = MODEL_DATA.to_vec();
-    let rknn = RKNN::new_with_library("/usr/lib/librknnrt.so", &mut model_data, flag).unwrap();
+    let rknn = RKNN::new_with_library(
+        utils::find_rknn_library()
+            .next()
+            .expect("No RKNN library found. Please install librknnrt.so."),
+        &mut model_data,
+        flag,
+    )
+    .unwrap();
     rknn
 }
 
