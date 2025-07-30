@@ -10,7 +10,7 @@ Rust bindings for the [Rockchip RKNN API (rknpu2)](https://github.com/airockchip
 
 ## Features
 
-- Safe and idiomatic Rust abstractions over the `librknn_api` C API
+- Safe and idiomatic Rust abstractions over the `librknnrt.so` C API
 - Support for loading models, setting inputs, running inference, and reading outputs
 - There will be Zero-copy input/output buffer support
 - Includes both low-level `-sys` bindings and higher-level wrappers
