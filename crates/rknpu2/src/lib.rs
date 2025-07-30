@@ -1,4 +1,5 @@
 #![cfg_attr(feature = "docs", feature(doc_cfg))]
+#![doc = include_str!("../README.md")]
 
 /// Error type
 pub mod error;
