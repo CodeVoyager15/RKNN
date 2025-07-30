@@ -21,3 +21,7 @@ rk3576 = [
 ] # For RK3576 / RK3588 with full multi-core support
 docs = ["rv110x", "rk2118", "rk35xx", "rk3576"] # Requires nightly compiler
 libloading = ["rknpu2-sys/libloading"]
+
+[dev-dependencies]
+image = "0.25.6"
+itertools = "0.14.0"
