@@ -13,6 +13,9 @@ pub mod rknn;
 /// Tensor types
 pub mod tensor;
 
+/// Utility functions
+pub mod utils;
+
 pub use {error::Error, rknn::RKNN};
 
 /// Trait and implementation for RKNN
