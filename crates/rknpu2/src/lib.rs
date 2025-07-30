@@ -19,4 +19,7 @@ pub use {error::Error, rknn::RKNN};
 #[allow(non_snake_case)]
 pub mod api;
 
-pub use rknpu2_sys;
+pub use {
+    half::{bf16, f16},
+    rknpu2_sys,
+};
