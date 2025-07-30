@@ -1,5 +1,3 @@
-#![cfg(any(feature = "rk3576", feature = "rk35xx"))]
-
 use {
     image::ImageReader,
     itertools::Itertools,
@@ -38,6 +36,7 @@ fn preprocess_image(img: &image::RgbImage) -> Vec<i8> {
     result
 }
 
+#[cfg(any(feature = "rk3576", feature = "rk35xx"))]
 fn main() {
     let img_path = match std::env::args().nth(1) {
         Some(path) => path,
@@ -131,4 +130,9 @@ fn softmax(logits: &[f32]) -> Vec<f32> {
 
 fn dequantize_output(output: &[i8], scale: f32) -> Vec<f32> {
     output.iter().map(|&x| x as f32 * scale).collect()
+}
+
+#[cfg(not(any(feature = "rk3576", feature = "rk35xx")))]
+fn main() {
+    println!("mobilenet example requires rk3576 or rk35xx feature");
 }
