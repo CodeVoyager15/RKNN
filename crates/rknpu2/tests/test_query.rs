@@ -2,7 +2,10 @@
 use rknpu2::utils;
 use rknpu2::{
     RKNN,
-    query::{InputAttr, InputOutputNum, SdkVersion, output_attr::OutputAttr},
+    query::{
+        InputAttr, InputOutputNum, NativeInputAttr, NativeOutputAttr, SdkVersion,
+        output_attr::OutputAttr,
+    },
     tensor::{DataType, DataTypeKind, QuantType, QuantTypeKind},
 };
 
@@ -74,6 +77,40 @@ fn test_output_attr() {
     assert_eq!(output_attr.dtype(), DataTypeKind::Int8(DataType::INT8));
     assert_eq!(
         output_attr.qnt_type(),
+        QuantTypeKind::AffineAsymmetric(QuantType::QNT_AFFINE_ASYMMETRIC)
+    );
+}
+
+#[test]
+fn test_native_input_attr() {
+    let rknn = get_rknn();
+    let native_input_attr = rknn.query_with_input::<NativeInputAttr>(0).unwrap();
+
+    assert_eq!(native_input_attr.dims(), &[1, 224, 224, 3]);
+    assert!(!native_input_attr.name().is_empty());
+    assert_eq!(
+        native_input_attr.dtype(),
+        DataTypeKind::Int8(DataType::INT8)
+    );
+    assert_eq!(
+        native_input_attr.qnt_type(),
+        QuantTypeKind::AffineAsymmetric(QuantType::QNT_AFFINE_ASYMMETRIC)
+    );
+}
+
+#[test]
+fn test_native_output_attr() {
+    let rknn = get_rknn();
+    let native_output_attr = rknn.query_with_input::<NativeOutputAttr>(0).unwrap();
+
+    assert_eq!(native_output_attr.dims(), &[1, 1000]);
+    assert!(!native_output_attr.name().is_empty());
+    assert_eq!(
+        native_output_attr.dtype(),
+        DataTypeKind::Int8(DataType::INT8)
+    );
+    assert_eq!(
+        native_output_attr.qnt_type(),
         QuantTypeKind::AffineAsymmetric(QuantType::QNT_AFFINE_ASYMMETRIC)
     );
 }
