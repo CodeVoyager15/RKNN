@@ -1,7 +1,10 @@
 use {
     image::ImageReader,
     itertools::Itertools,
-    rknpu2::{RKNN, tensor::builder::TensorBuilder},
+    rknpu2::{
+        RKNN,
+        tensor::{TensorT, builder::TensorBuilder, tensor::Tensor},
+    },
     std::{
         collections::BTreeMap,
         io::{BufRead, BufReader},
@@ -65,8 +68,9 @@ fn main() {
     model.set_inputs(&[input]).unwrap();
     model.run().unwrap();
 
-    let outputs = model.get_outputs::<i8>().unwrap();
-    let output = outputs[0].as_slice();
+    let mut outputs = model.get_outputs().unwrap();
+    let output = <TensorT as TryInto<Tensor<i8>>>::try_into(outputs.remove(0)).unwrap();
+    let output = output.as_slice();
     let logits = dequantize_output(output, OUTPUT_SCALE);
     let softmax_output = softmax(&logits);
     let top5 = softmax_output

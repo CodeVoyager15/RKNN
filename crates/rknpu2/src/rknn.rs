@@ -1,10 +1,7 @@
 use rknpu2_sys::rknn_context;
 
 #[cfg(any(feature = "rk3576", feature = "rk35xx"))]
-use crate::{
-    query::InputOutputNum,
-    tensor::{TensorType, builder::TensorBuilder, tensor::Tensor},
-};
+use crate::tensor::{IntoInputs, TensorT, builder::TensorBuilder};
 use {
     crate::{
         Error,
@@ -70,7 +67,9 @@ impl<A: RKNNAPI> RKNN<A> {
         feature = "docs",
         doc(cfg(any(feature = "rk35xx", feature = "rk3576")))
     )]
-    pub fn set_inputs<T: TensorType>(&self, tensors: &[Tensor<T>]) -> Result<(), Error> {
+    pub fn set_inputs<I: IntoInputs>(&self, tensors: I) -> Result<(), Error> {
+        let tensors = tensors.into_inputs();
+
         let mut ffi_inputs: Vec<rknpu2_sys::rknn_input> =
             tensors.iter().map(|t| t.as_input()).collect();
 
@@ -91,13 +90,71 @@ impl<A: RKNNAPI> RKNN<A> {
         feature = "docs",
         doc(cfg(any(feature = "rk35xx", feature = "rk3576")))
     )]
-    pub fn get_outputs<T: TensorType + Copy>(&self) -> Result<Vec<Tensor<T>>, Error> {
-        let mut outputs = Vec::new();
+    pub fn get_outputs(&self) -> Result<Vec<TensorT>, Error> {
+        use crate::{
+            bf16, f16,
+            query::{InputOutputNum, OutputAttr},
+        };
+
+        let mut outputs = Vec::<TensorT>::new();
         let num = self.query::<InputOutputNum>()?;
         for i in 0..num.output_num() {
-            let output = TensorBuilder::new_output(&self, i).allocate()?;
+            let output_attr = self.query_with_input::<OutputAttr>(i)?;
 
-            outputs.push(output);
+            match output_attr.dtype() {
+                crate::tensor::DataTypeKind::Float32(_) => outputs.push(
+                    TensorBuilder::new_output(&self, i)
+                        .allocate::<f32>()?
+                        .into(),
+                ),
+                crate::tensor::DataTypeKind::Float16(_) => outputs.push(
+                    TensorBuilder::new_output(&self, i)
+                        .allocate::<f16>()?
+                        .into(),
+                ),
+                crate::tensor::DataTypeKind::BFloat16(_) => outputs.push(
+                    TensorBuilder::new_output(&self, i)
+                        .allocate::<bf16>()?
+                        .into(),
+                ),
+                crate::tensor::DataTypeKind::Int4(_) => {
+                    todo!("rknpu2 doesn't currently support Int4")
+                }
+                crate::tensor::DataTypeKind::Int8(_) => {
+                    outputs.push(TensorBuilder::new_output(&self, i).allocate::<i8>()?.into())
+                }
+                crate::tensor::DataTypeKind::UInt8(_) => {
+                    outputs.push(TensorBuilder::new_output(&self, i).allocate::<u8>()?.into())
+                }
+                crate::tensor::DataTypeKind::Int16(_) => outputs.push(
+                    TensorBuilder::new_output(&self, i)
+                        .allocate::<i16>()?
+                        .into(),
+                ),
+                crate::tensor::DataTypeKind::UInt16(_) => outputs.push(
+                    TensorBuilder::new_output(&self, i)
+                        .allocate::<u16>()?
+                        .into(),
+                ),
+                crate::tensor::DataTypeKind::Int32(_) => outputs.push(
+                    TensorBuilder::new_output(&self, i)
+                        .allocate::<i32>()?
+                        .into(),
+                ),
+                crate::tensor::DataTypeKind::UInt32(_) => outputs.push(
+                    TensorBuilder::new_output(&self, i)
+                        .allocate::<u32>()?
+                        .into(),
+                ),
+                crate::tensor::DataTypeKind::Int64(_) => outputs.push(
+                    TensorBuilder::new_output(&self, i)
+                        .allocate::<i64>()?
+                        .into(),
+                ),
+                crate::tensor::DataTypeKind::Bool(_) => todo!(),
+                crate::tensor::DataTypeKind::Max(_) => todo!(),
+                crate::tensor::DataTypeKind::Other(_) => todo!(),
+            }
         }
 
         let mut outputs_ffi = outputs

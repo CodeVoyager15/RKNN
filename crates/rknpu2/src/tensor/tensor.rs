@@ -20,6 +20,33 @@ pub struct Tensor<T> {
     _buffer: Option<Box<[T]>>,
 }
 
+/// Clone implementation for Tensor<T>
+impl<T: Clone> Clone for Tensor<T> {
+    fn clone(&self) -> Self {
+        // The extra code is necessary for deep copying the tensor's buffer.
+        // It ensures that the cloned tensor has its own independent buffer.
+
+        let buffer = self._buffer.as_ref().map(|b| b.clone()); // deep copy if present
+
+        let ptr = match &buffer {
+            Some(b) => NonNull::new(b.as_ptr() as *mut T).unwrap(),
+            None => self.ptr,
+        };
+
+        Tensor {
+            ptr,
+            len: self.len,
+            _layout: self._layout,
+            fmt: self.fmt,
+            index: self.index,
+            pass_through: self.pass_through,
+            _stride_info: self._stride_info.clone(),
+            _marker: PhantomData,
+            _buffer: buffer,
+        }
+    }
+}
+
 impl<T> Tensor<T> {
     pub(crate) unsafe fn from_raw_parts(
         ptr: *mut T,
