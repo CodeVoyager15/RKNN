@@ -1,4 +1,7 @@
-use rknpu2::{RKNN, tensor::builder::TensorBuilder};
+use rknpu2::{
+    RKNN,
+    tensor::{TensorT, builder::TensorBuilder, tensor::Tensor},
+};
 
 static MODEL_DATA: &[u8] = include_bytes!("./fixtures/mobilenet_v2.rknn");
 
@@ -42,8 +45,9 @@ fn test_run() {
     input.fill_with(0i8);
     model.set_inputs(&[input]).unwrap();
     model.run().unwrap();
-    let outputs = model.get_outputs::<i8>().unwrap();
-    let output = outputs[0].as_slice();
+    let mut outputs = model.get_outputs().unwrap();
+    let output = <TensorT as TryInto<Tensor<i8>>>::try_into(outputs.remove(0)).unwrap();
+    let output = output.as_slice();
     assert_eq!(output.len(), 1000);
 }
 
@@ -63,8 +67,9 @@ fn test_perf_detail() {
     input.fill_with(0i8);
     model.set_inputs(&[input]).unwrap();
     model.run().unwrap();
-    let outputs = model.get_outputs::<i8>().unwrap();
-    let output = outputs[0].as_slice();
+    let mut outputs = model.get_outputs().unwrap();
+    let output = <TensorT as TryInto<Tensor<i8>>>::try_into(outputs.remove(0)).unwrap();
+    let output = output.as_slice();
     assert_eq!(output.len(), 1000);
 
     let perf_run = model.query::<PerfRun>().unwrap();

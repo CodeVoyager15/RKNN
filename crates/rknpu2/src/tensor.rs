@@ -348,3 +348,28 @@ impl<'a> IntoInputs for &'a [TensorT] {
         self.to_vec()
     }
 }
+
+macro_rules! impl_tryfrom_tensor {
+    ($ty:ty, $variant:ident) => {
+        impl TryFrom<TensorT> for Tensor<$ty> {
+            type Error = &'static str;
+            fn try_from(t: TensorT) -> Result<Self, Self::Error> {
+                match t {
+                    TensorT::$variant(inner) => Ok(inner),
+                    _ => Err(concat!("TensorT is not ", stringify!($variant))),
+                }
+            }
+        }
+    };
+}
+
+impl_tryfrom_tensor!(u8, UInt8);
+impl_tryfrom_tensor!(i8, Int8);
+impl_tryfrom_tensor!(i32, Int32);
+impl_tryfrom_tensor!(u32, UInt32);
+impl_tryfrom_tensor!(i16, Int16);
+impl_tryfrom_tensor!(u16, UInt16);
+impl_tryfrom_tensor!(i64, Int64);
+impl_tryfrom_tensor!(f32, Float32);
+impl_tryfrom_tensor!(f16, Float16);
+impl_tryfrom_tensor!(bf16, BFloat16);
