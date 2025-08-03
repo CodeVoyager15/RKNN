@@ -1,5 +1,6 @@
 /// Tensor types, tensors, and utilities
 use {
+    crate::tensor::tensor::Tensor,
     half::{bf16, f16},
     rknpu2_sys::{
         _rknn_tensor_format::{
@@ -235,4 +236,115 @@ impl TensorType for u16 {
 
 impl TensorType for i64 {
     const TYPE: _rknn_tensor_type::Type = _rknn_tensor_type::RKNN_TENSOR_INT64;
+}
+
+#[derive(Debug, Clone)]
+pub enum TensorT {
+    Float32(Tensor<f32>),
+    Float16(Tensor<f16>),
+    BFloat16(Tensor<bf16>),
+    UInt8(Tensor<u8>),
+    Int8(Tensor<i8>),
+    Int32(Tensor<i32>),
+    UInt32(Tensor<u32>),
+    Int16(Tensor<i16>),
+    UInt16(Tensor<u16>),
+    Int64(Tensor<i64>),
+}
+
+impl TensorT {
+    pub fn as_input(&self) -> rknpu2_sys::rknn_input {
+        match self {
+            TensorT::Float32(tensor) => tensor.as_input(),
+            TensorT::Float16(tensor) => tensor.as_input(),
+            TensorT::BFloat16(tensor) => tensor.as_input(),
+            TensorT::UInt8(tensor) => tensor.as_input(),
+            TensorT::Int8(tensor) => tensor.as_input(),
+            TensorT::Int32(tensor) => tensor.as_input(),
+            TensorT::UInt32(tensor) => tensor.as_input(),
+            TensorT::Int16(tensor) => tensor.as_input(),
+            TensorT::UInt16(tensor) => tensor.as_input(),
+            TensorT::Int64(tensor) => tensor.as_input(),
+        }
+    }
+
+    pub fn as_output(&mut self) -> rknpu2_sys::rknn_output {
+        match self {
+            TensorT::Float32(tensor) => tensor.as_output(),
+            TensorT::Float16(tensor) => tensor.as_output(),
+            TensorT::BFloat16(tensor) => tensor.as_output(),
+            TensorT::UInt8(tensor) => tensor.as_output(),
+            TensorT::Int8(tensor) => tensor.as_output(),
+            TensorT::Int32(tensor) => tensor.as_output(),
+            TensorT::UInt32(tensor) => tensor.as_output(),
+            TensorT::Int16(tensor) => tensor.as_output(),
+            TensorT::UInt16(tensor) => tensor.as_output(),
+            TensorT::Int64(tensor) => tensor.as_output(),
+        }
+    }
+}
+
+macro_rules! impl_tensor_from {
+    ($ty:ty, $variant:ident) => {
+        impl From<Tensor<$ty>> for TensorT {
+            fn from(t: Tensor<$ty>) -> Self {
+                TensorT::$variant(t)
+            }
+        }
+
+        impl IntoInputs for Vec<Tensor<$ty>> {
+            fn into_inputs(self) -> Inputs {
+                self.into_iter().map(TensorT::$variant).collect()
+            }
+        }
+
+        impl IntoInputs for &[Tensor<$ty>] {
+            fn into_inputs(self) -> Inputs {
+                self.iter().cloned().map(TensorT::$variant).collect()
+            }
+        }
+
+        impl<const N: usize> IntoInputs for &[Tensor<$ty>; N] {
+            fn into_inputs(self) -> Inputs {
+                self.iter().cloned().map(TensorT::$variant).collect()
+            }
+        }
+
+        impl<const N: usize> IntoInputs for [Tensor<$ty>; N] {
+            fn into_inputs(self) -> Inputs {
+                self.into_iter().map(TensorT::$variant).collect()
+            }
+        }
+    };
+}
+
+impl_tensor_from!(u8, UInt8);
+impl_tensor_from!(i8, Int8);
+impl_tensor_from!(i32, Int32);
+impl_tensor_from!(u32, UInt32);
+impl_tensor_from!(i16, Int16);
+impl_tensor_from!(u16, UInt16);
+impl_tensor_from!(i64, Int64);
+impl_tensor_from!(f32, Float32);
+impl_tensor_from!(f16, Float16);
+impl_tensor_from!(bf16, BFloat16);
+
+pub type Inputs = Vec<TensorT>;
+
+pub trait IntoInputs {
+    fn into_inputs(self) -> Inputs;
+}
+
+// for Inputs itself
+impl IntoInputs for Inputs {
+    fn into_inputs(self) -> Inputs {
+        self
+    }
+}
+
+// &Inputs too
+impl<'a> IntoInputs for &'a [TensorT] {
+    fn into_inputs(self) -> Inputs {
+        self.to_vec()
+    }
 }

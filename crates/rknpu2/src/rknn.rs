@@ -3,13 +3,14 @@ use rknpu2_sys::rknn_context;
 #[cfg(any(feature = "rk3576", feature = "rk35xx"))]
 use crate::{
     query::InputOutputNum,
-    tensor::{TensorType, builder::TensorBuilder, tensor::Tensor},
+    tensor::{IntoInputs, TensorType, builder::TensorBuilder, tensor::Tensor},
 };
 use {
     crate::{
         Error,
         api::RKNNAPI,
         query::{Query, QueryWithInput},
+        tensor::TensorT,
     },
     std::{ffi::c_void, ptr},
 };
@@ -70,7 +71,9 @@ impl<A: RKNNAPI> RKNN<A> {
         feature = "docs",
         doc(cfg(any(feature = "rk35xx", feature = "rk3576")))
     )]
-    pub fn set_inputs<T: TensorType>(&self, tensors: &[Tensor<T>]) -> Result<(), Error> {
+    pub fn set_inputs<I: IntoInputs>(&self, tensors: I) -> Result<(), Error> {
+        let tensors = tensors.into_inputs();
+
         let mut ffi_inputs: Vec<rknpu2_sys::rknn_input> =
             tensors.iter().map(|t| t.as_input()).collect();
 
