@@ -1,4 +1,10 @@
-use rknpu2_sys::rknn_context;
+use rknpu2_sys::{
+    _rknn_core_mask::{
+        RKNN_NPU_CORE_0, RKNN_NPU_CORE_0_1, RKNN_NPU_CORE_0_1_2, RKNN_NPU_CORE_1, RKNN_NPU_CORE_2,
+        RKNN_NPU_CORE_ALL, RKNN_NPU_CORE_AUTO,
+    },
+    rknn_context,
+};
 
 #[cfg(any(feature = "rk3576", feature = "rk35xx"))]
 use crate::tensor::{IntoInputs, TensorT, builder::TensorBuilder};
@@ -176,6 +182,24 @@ impl<A: RKNNAPI> RKNN<A> {
         }
 
         Ok(outputs)
+    }
+
+    pub const NPU_CORE_0: u32 = RKNN_NPU_CORE_0;
+    pub const NPU_CORE_1: u32 = RKNN_NPU_CORE_1;
+    pub const NPU_CORE_2: u32 = RKNN_NPU_CORE_2;
+    pub const NPU_CORE_ALL: u32 = RKNN_NPU_CORE_ALL;
+    pub const NPU_CORE_0_1: u32 = RKNN_NPU_CORE_0_1;
+    pub const NPU_CORE_0_1_2: u32 = RKNN_NPU_CORE_0_1_2;
+    pub const NPU_CORE_AUTO: u32 = RKNN_NPU_CORE_AUTO;
+
+    #[cfg(feature = "rk3576")]
+    #[cfg_attr(feature = "docs", doc(cfg(feature = "rk3576")))]
+    pub fn set_core_mask(&self, mask: u32) -> Result<(), Error> {
+        unsafe {
+            self.api.set_core_mask(self.ctx, mask)?;
+        }
+
+        Ok(())
     }
 }
 
