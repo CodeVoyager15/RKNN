@@ -3,8 +3,9 @@ use rknpu2::utils;
 use rknpu2::{
     RKNN,
     query::{
-        InputAttr, InputOutputNum, NativeInputAttr, NativeOutputAttr, SdkVersion,
-        output_attr::OutputAttr,
+        InputAttr, InputOutputNum, NativeInputAttr, NativeNC1HWC2InputAttr,
+        NativeNC1HWC2OutputAttr, NativeNHWCInputAttr, NativeNHWCOutputAttr, NativeOutputAttr,
+        SdkVersion, output_attr::OutputAttr,
     },
     tensor::{DataType, DataTypeKind, QuantType, QuantTypeKind},
 };
@@ -111,6 +112,74 @@ fn test_native_output_attr() {
     );
     assert_eq!(
         native_output_attr.qnt_type(),
+        QuantTypeKind::AffineAsymmetric(QuantType::QNT_AFFINE_ASYMMETRIC)
+    );
+}
+
+#[test]
+fn test_native_nhwc_input_attr() {
+    let rknn = get_rknn();
+    let native_nhwc_input_attr = rknn.query_with_input::<NativeNHWCInputAttr>(0).unwrap();
+
+    assert_eq!(native_nhwc_input_attr.dims(), &[1, 224, 224, 3]);
+    assert!(!native_nhwc_input_attr.name().is_empty());
+    assert_eq!(
+        native_nhwc_input_attr.dtype(),
+        DataTypeKind::Int8(DataType::INT8)
+    );
+    assert_eq!(
+        native_nhwc_input_attr.qnt_type(),
+        QuantTypeKind::AffineAsymmetric(QuantType::QNT_AFFINE_ASYMMETRIC)
+    );
+}
+
+#[test]
+fn test_native_nhwc_output_attr() {
+    let rknn = get_rknn();
+    let native_nhwc_output_attr = rknn.query_with_input::<NativeNHWCOutputAttr>(0).unwrap();
+
+    assert_eq!(native_nhwc_output_attr.dims(), &[1, 1000]);
+    assert!(!native_nhwc_output_attr.name().is_empty());
+    assert_eq!(
+        native_nhwc_output_attr.dtype(),
+        DataTypeKind::Int8(DataType::INT8)
+    );
+    assert_eq!(
+        native_nhwc_output_attr.qnt_type(),
+        QuantTypeKind::AffineAsymmetric(QuantType::QNT_AFFINE_ASYMMETRIC)
+    );
+}
+
+#[test]
+fn test_native_nc1hwc2_input_attr() {
+    let rknn = get_rknn();
+    let native_nc1hwc2_input_attr = rknn.query_with_input::<NativeNC1HWC2InputAttr>(0).unwrap();
+
+    assert_eq!(native_nc1hwc2_input_attr.dims(), &[1, 224, 224, 3]); // The model doesn't have NC1HWC2 formatted input tensors
+    assert!(!native_nc1hwc2_input_attr.name().is_empty());
+    assert_eq!(
+        native_nc1hwc2_input_attr.dtype(),
+        DataTypeKind::Int8(DataType::INT8)
+    );
+    assert_eq!(
+        native_nc1hwc2_input_attr.qnt_type(),
+        QuantTypeKind::AffineAsymmetric(QuantType::QNT_AFFINE_ASYMMETRIC)
+    );
+}
+
+#[test]
+fn test_native_nc1hwc2_output_attr() {
+    let rknn = get_rknn();
+    let native_nc1hwc2_output_attr = rknn.query_with_input::<NativeNC1HWC2OutputAttr>(0).unwrap();
+
+    assert_eq!(native_nc1hwc2_output_attr.dims(), &[1, 1000]);
+    assert!(!native_nc1hwc2_output_attr.name().is_empty());
+    assert_eq!(
+        native_nc1hwc2_output_attr.dtype(),
+        DataTypeKind::Int8(DataType::INT8)
+    );
+    assert_eq!(
+        native_nc1hwc2_output_attr.qnt_type(),
         QuantTypeKind::AffineAsymmetric(QuantType::QNT_AFFINE_ASYMMETRIC)
     );
 }
