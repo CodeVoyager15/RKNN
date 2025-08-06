@@ -19,9 +19,19 @@ rk35xx = ["rknpu2-sys/rk35xx"] # For RK356x / RV1126B
 rk3576 = [
     "rknpu2-sys/rk3576",
 ] # For RK3576 / RK3588 with full multi-core support
-docs = ["rv110x", "rk2118", "rk35xx", "rk3576"] # Requires nightly compiler
+docs = [
+    "rv110x",
+    "rk2118",
+    "rk35xx",
+    "rk3576",
+    "libloading",
+] # Requires nightly compiler
 libloading = ["rknpu2-sys/libloading"]
 
 [dev-dependencies]
 image = "0.25.6"
 itertools = "0.14.0"
+
+[package.metadata.docs.rs]
+features = ["docs"]
+rustc-args = ["--cfg", "docsrs"]
