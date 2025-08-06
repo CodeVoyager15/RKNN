@@ -10,6 +10,8 @@ pub trait Query: From<Self::Output> + Sized {
 pub mod in_out_num;
 pub mod input_attr;
 pub mod native_input_attr;
+pub mod native_nhwc_input_attr;
+pub mod native_nhwc_output_attr;
 pub mod native_output_attr;
 pub mod output_attr;
 pub mod sdk_version;
@@ -30,6 +32,7 @@ pub mod perf_detail;
 
 pub use {
     in_out_num::InputOutputNum, native_input_attr::NativeInputAttr,
+    native_nhwc_input_attr::NativeNHWCInputAttr, native_nhwc_output_attr::NativeNHWCOutputAttr,
     native_output_attr::NativeOutputAttr, sdk_version::SdkVersion,
 };
 
