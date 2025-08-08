@@ -72,6 +72,10 @@ impl InputAttr {
     pub fn affine_asymmetric_param(&self) -> f32 {
         self.inner.scale
     }
+
+    pub fn zero_point(&self) -> i32 {
+        self.inner.zp
+    }
 }
 
 impl QueryWithInput for InputAttr {

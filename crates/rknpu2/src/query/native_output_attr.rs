@@ -93,4 +93,8 @@ impl NativeOutputAttr {
     pub fn size_with_stride(&self) -> u32 {
         self.inner.size_with_stride
     }
+
+    pub fn zero_point(&self) -> i32 {
+        self.inner.zp
+    }
 }
