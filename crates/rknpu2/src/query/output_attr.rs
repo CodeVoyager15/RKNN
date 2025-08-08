@@ -87,4 +87,9 @@ impl OutputAttr {
     pub fn affine_asymmetric_param(&self) -> f32 {
         self.inner.scale
     }
+
+    /// Zero point of the output tensor.
+    pub fn zero_point(&self) -> i32 {
+        self.inner.zp
+    }
 }
