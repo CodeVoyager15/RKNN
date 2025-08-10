@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 /// Query types for the query associated function.
 use rknpu2_sys::_rknn_query_cmd::Type;
 
@@ -32,6 +34,8 @@ pub mod perf_run;
 )]
 pub mod perf_detail;
 
+use crate::tensor::{DataTypeKind, QuantTypeKind, TensorFormatKind};
+
 pub use {
     in_out_num::InputOutputNum, native_input_attr::NativeInputAttr,
     native_nc1hwc2_input_attr::NativeNC1HWC2InputAttr,
@@ -65,3 +69,71 @@ pub trait QueryWithInput: From<Self::Output> + Sized {
 }
 
 pub use {input_attr::InputAttr, output_attr::OutputAttr};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Io {
+    Input,
+    Output,
+}
+
+impl Display for Io {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Io::Input => write!(f, "Input"),
+            Io::Output => write!(f, "Output"),
+        }
+    }
+}
+
+impl Io {
+    pub fn is_input(&self) -> bool {
+        matches!(self, Io::Input)
+    }
+
+    pub fn is_output(&self) -> bool {
+        matches!(self, Io::Output)
+    }
+}
+
+/// Tensor attribute view trait
+pub trait TensorAttrView {
+    fn io(&self) -> Io;
+
+    /// Tensor index
+    fn index(&self) -> u32;
+    /// Tensor name
+    fn name(&self) -> String;
+    /// Tensor data type
+    fn dtype(&self) -> DataTypeKind;
+
+    /// Number of dimensions
+    fn num_dims(&self) -> u32;
+
+    /// Tensor dimensions
+    fn dims(&self) -> &[u32];
+
+    /// Tensor format
+    fn format(&self) -> TensorFormatKind;
+
+    /// Quantization type
+    fn qnt_type(&self) -> QuantTypeKind;
+
+    /// Number of elements
+    fn num_elements(&self) -> u32;
+
+    /// Scale factor
+    fn scale(&self) -> f32;
+    /// Zero point
+    fn zero_point(&self) -> i32;
+    /// Fractional length
+    fn fl(&self) -> i8; // DFP fractional length
+    /// w stride in bytes
+    fn w_stride(&self) -> u32; // bytes
+
+    /// h stride in bytes
+    fn h_stride(&self) -> u32; // bytes (plane stride)
+    /// Size in bytes
+    fn size(&self) -> u32;
+    /// Size in bytes
+    fn size_with_stride(&self) -> u32;
+}
