@@ -126,12 +126,12 @@ pub trait TensorAttrView {
     /// Zero point
     fn zero_point(&self) -> i32;
     /// Fractional length
-    fn fl(&self) -> i8; // DFP fractional length
-    /// w stride in bytes
-    fn w_stride(&self) -> u32; // bytes
+    fn fl(&self) -> i8;
+    /// pixels per row (width + padding), unit: pixel
+    fn w_stride(&self) -> u32;
 
-    /// h stride in bytes
-    fn h_stride(&self) -> u32; // bytes (plane stride)
+    /// rows per image (height + padding), unit: pixel; 0 => same as H
+    fn h_stride(&self) -> u32;
     /// Size in bytes
     fn size(&self) -> u32;
     /// Size in bytes
