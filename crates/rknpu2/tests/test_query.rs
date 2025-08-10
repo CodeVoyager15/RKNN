@@ -5,7 +5,7 @@ use rknpu2::{
     query::{
         InputAttr, InputOutputNum, NativeInputAttr, NativeNC1HWC2InputAttr,
         NativeNC1HWC2OutputAttr, NativeNHWCInputAttr, NativeNHWCOutputAttr, NativeOutputAttr,
-        SdkVersion, output_attr::OutputAttr,
+        SdkVersion, TensorAttrView, output_attr::OutputAttr,
     },
     tensor::{DataType, DataTypeKind, QuantType, QuantTypeKind},
 };

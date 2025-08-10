@@ -12,7 +12,7 @@ use {
     crate::{
         Error,
         api::RKNNAPI,
-        query::{Query, QueryWithInput},
+        query::{Query, QueryWithInput, TensorAttrView},
     },
     std::{ffi::c_void, ptr},
 };

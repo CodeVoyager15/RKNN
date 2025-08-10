@@ -1,7 +1,7 @@
 /// Model output attributes.
 use {
     crate::{
-        query::QueryWithInput,
+        query::{Io, QueryWithInput, TensorAttrView},
         tensor::{DataTypeKind, QuantTypeKind, TensorFormatKind},
     },
     rknpu2_sys::rknn_tensor_attr,
@@ -31,65 +31,69 @@ impl From<rknn_tensor_attr> for OutputAttr {
     }
 }
 
-impl OutputAttr {
-    /// Index of the output tensor.
-    pub fn index(&self) -> u32 {
+impl TensorAttrView for OutputAttr {
+    fn io(&self) -> Io {
+        Io::Output
+    }
+
+    fn index(&self) -> u32 {
         self.inner.index
     }
 
-    /// Number of dimensions of the output tensor.
-    pub fn num_dims(&self) -> u32 {
+    fn num_dims(&self) -> u32 {
         self.inner.n_dims
     }
 
-    /// Dimensions of the output tensor.
-    pub fn dims(&self) -> &[u32] {
+    fn dims(&self) -> &[u32] {
         &self.inner.dims[..self.inner.n_dims as usize]
     }
 
-    /// Name of the output tensor.
-    pub fn name(&self) -> String {
+    fn name(&self) -> String {
         let cstr = unsafe { CStr::from_ptr(self.inner.name.as_ptr()) };
         cstr.to_string_lossy().into_owned()
     }
 
-    /// Number of elements in the output tensor.
-    pub fn num_elements(&self) -> u32 {
+    fn num_elements(&self) -> u32 {
         self.inner.n_elems
     }
 
-    /// Size of the output tensor in bytes.
-    pub fn size(&self) -> u32 {
+    fn size(&self) -> u32 {
         self.inner.size
     }
 
-    /// Format of the output tensor.
-    pub fn format(&self) -> TensorFormatKind {
+    fn format(&self) -> TensorFormatKind {
         self.inner.fmt.into()
     }
 
-    /// Data type of the output tensor.
-    pub fn dtype(&self) -> DataTypeKind {
+    fn dtype(&self) -> DataTypeKind {
         self.inner.type_.into()
     }
 
-    /// Quantization type of the output tensor.
-    pub fn qnt_type(&self) -> QuantTypeKind {
+    fn qnt_type(&self) -> QuantTypeKind {
         self.inner.qnt_type.into()
     }
 
-    /// Fixed-point parameter of the output tensor.
-    pub fn dfp_param(&self) -> i8 {
+    fn fl(&self) -> i8 {
         self.inner.fl
     }
 
-    /// Affine asymmetric parameter of the output tensor.
-    pub fn affine_asymmetric_param(&self) -> f32 {
+    fn scale(&self) -> f32 {
         self.inner.scale
     }
 
-    /// Zero point of the output tensor.
-    pub fn zero_point(&self) -> i32 {
+    fn zero_point(&self) -> i32 {
         self.inner.zp
+    }
+
+    fn h_stride(&self) -> u32 {
+        self.inner.h_stride
+    }
+
+    fn w_stride(&self) -> u32 {
+        self.inner.w_stride
+    }
+
+    fn size_with_stride(&self) -> u32 {
+        self.inner.size_with_stride
     }
 }
