@@ -2,7 +2,7 @@ use crate::{
     Error, RKNN,
     api::RKNNAPI,
     query::{InputAttr, output_attr::OutputAttr},
-    tensor::{StrideInfo, TensorType, tensor::Tensor},
+    tensor::{TensorType, tensor::Tensor},
 };
 
 /// TensorBuilder is a helper struct for creating tensors.
@@ -64,7 +64,6 @@ impl<'a, A: RKNNAPI> TensorBuilder<'a, A> {
                 attr.fmt.into(),
                 attr.fmt,
                 false,
-                None,
                 Some(buffer.into_boxed_slice()),
             ))
         }

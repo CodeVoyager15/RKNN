@@ -187,13 +187,6 @@ impl From<_rknn_tensor_qnt_type::Type> for QuantTypeKind {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub struct StrideInfo {
-    pub w_stride: u32,
-    pub h_stride: u32,
-    pub size_with_stride: u32,
-}
-
 pub trait TensorType: Sized + Default {
     const TYPE: _rknn_tensor_type::Type;
 }

@@ -1,9 +1,9 @@
 use {
     crate::{
         Error,
-        tensor::{StrideInfo, TensorFormatKind, TensorType},
+        tensor::{TensorFormatKind, TensorType},
     },
-    std::{marker::PhantomData, ptr::NonNull},
+    std::ptr::NonNull,
 };
 
 /// An input or output tensor of type T.
@@ -15,8 +15,6 @@ pub struct Tensor<T> {
     fmt: rknpu2_sys::rknn_tensor_format,
     index: u32,
     pass_through: bool,
-    _stride_info: Option<StrideInfo>,
-    _marker: PhantomData<T>,
     _buffer: Option<Box<[T]>>,
 }
 
@@ -40,8 +38,6 @@ impl<T: Clone> Clone for Tensor<T> {
             fmt: self.fmt,
             index: self.index,
             pass_through: self.pass_through,
-            _stride_info: self._stride_info.clone(),
-            _marker: PhantomData,
             _buffer: buffer,
         }
     }
@@ -55,7 +51,6 @@ impl<T> Tensor<T> {
         layout: TensorFormatKind,
         fmt: rknpu2_sys::rknn_tensor_format,
         pass_through: bool,
-        stride_info: Option<StrideInfo>,
         buffer: Option<Box<[T]>>,
     ) -> Self {
         Self {
@@ -66,8 +61,6 @@ impl<T> Tensor<T> {
             fmt,
             index,
             pass_through,
-            _stride_info: stride_info,
-            _marker: PhantomData,
             _buffer: buffer,
         }
     }
