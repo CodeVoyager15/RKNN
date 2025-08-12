@@ -69,39 +69,4 @@ impl<'a, A: RKNNAPI> TensorBuilder<'a, A> {
             ))
         }
     }
-
-    pub unsafe fn from_mmap<T: TensorType>(
-        self,
-        ptr: *mut T,
-        len: usize,
-    ) -> Result<Tensor<T>, Error> {
-        let attr = match self.kind {
-            TensorKind::Input => self.model.query_with_input::<InputAttr>(self.index)?.inner,
-            TensorKind::Output => self.model.query_with_input::<OutputAttr>(self.index)?.inner,
-        };
-
-        if attr.type_ != T::TYPE {
-            return Err(Error::TensorTypeMismatch {
-                expected: attr.type_,
-                actual: T::TYPE,
-            });
-        }
-
-        unsafe {
-            Ok(Tensor::<T>::from_raw_parts(
-                ptr,
-                len,
-                self.index,
-                attr.fmt.into(),
-                attr.fmt,
-                true,
-                Some(StrideInfo {
-                    w_stride: attr.w_stride,
-                    h_stride: attr.h_stride,
-                    size_with_stride: attr.size_with_stride,
-                }),
-                None,
-            ))
-        }
-    }
 }
