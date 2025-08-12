@@ -62,7 +62,6 @@ impl<'a, A: RKNNAPI> TensorBuilder<'a, A> {
                 len,
                 self.index,
                 attr.fmt.into(),
-                attr.fmt,
                 false,
                 Some(buffer.into_boxed_slice()),
             ))

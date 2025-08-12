@@ -11,11 +11,10 @@ use {
 pub struct Tensor<T> {
     ptr: NonNull<T>,
     len: usize,
-    _layout: TensorFormatKind,
-    fmt: rknpu2_sys::rknn_tensor_format,
+    layout: TensorFormatKind,
     index: u32,
     pass_through: bool,
-    _buffer: Option<Box<[T]>>,
+    buffer: Option<Box<[T]>>,
 }
 
 /// Clone implementation for Tensor<T>
@@ -24,7 +23,7 @@ impl<T: Clone> Clone for Tensor<T> {
         // The extra code is necessary for deep copying the tensor's buffer.
         // It ensures that the cloned tensor has its own independent buffer.
 
-        let buffer = self._buffer.as_ref().map(|b| b.clone()); // deep copy if present
+        let buffer = self.buffer.as_ref().map(|b| b.clone()); // deep copy if present
 
         let ptr = match &buffer {
             Some(b) => NonNull::new(b.as_ptr() as *mut T).unwrap(),
@@ -34,11 +33,10 @@ impl<T: Clone> Clone for Tensor<T> {
         Tensor {
             ptr,
             len: self.len,
-            _layout: self._layout,
-            fmt: self.fmt,
+            layout: self.layout,
             index: self.index,
             pass_through: self.pass_through,
-            _buffer: buffer,
+            buffer: buffer,
         }
     }
 }
@@ -49,7 +47,6 @@ impl<T> Tensor<T> {
         len: usize,
         index: u32,
         layout: TensorFormatKind,
-        fmt: rknpu2_sys::rknn_tensor_format,
         pass_through: bool,
         buffer: Option<Box<[T]>>,
     ) -> Self {
@@ -57,11 +54,10 @@ impl<T> Tensor<T> {
             ptr: NonNull::new(ptr)
                 .expect("Tensor::from_raw_parts got null pointer when creating Tensor"),
             len,
-            _layout: layout,
-            fmt,
+            layout,
             index,
             pass_through,
-            _buffer: buffer,
+            buffer,
         }
     }
 
@@ -112,7 +108,7 @@ impl<T> Tensor<T> {
             size: (self.len * std::mem::size_of::<T>()) as u32,
             pass_through: self.pass_through as u8,
             type_: T::TYPE,
-            fmt: self.fmt,
+            fmt: self.layout.into(),
         }
     }
 
