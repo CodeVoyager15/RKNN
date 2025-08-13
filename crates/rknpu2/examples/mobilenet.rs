@@ -1,10 +1,7 @@
 use {
     image::ImageReader,
     itertools::Itertools,
-    rknpu2::{
-        RKNN,
-        tensor::{TensorT, builder::TensorBuilder, tensor::Tensor},
-    },
+    rknpu2::RKNN,
     std::{
         collections::BTreeMap,
         io::{BufRead, BufReader},
@@ -16,8 +13,6 @@ static MODEL_DATA: &[u8] = include_bytes!("models/mobilenet_v2.rknn");
 static MODEL_OUTPUTS: &str = include_str!("models/mobilenet-synset.txt");
 
 const SCALE: f32 = 0.018658448;
-
-const OUTPUT_SCALE: f32 = 0.14192297;
 
 fn preprocess_image(img: &image::RgbImage) -> Vec<i8> {
     // ImageNet mean and std
@@ -41,6 +36,15 @@ fn preprocess_image(img: &image::RgbImage) -> Vec<i8> {
 
 #[cfg(any(feature = "rk3576", feature = "rk35xx"))]
 fn main() {
+    use rknpu2::{
+        io::{
+            buffer::{BufMutView, BufView},
+            input::Input,
+            output::{Output, OutputKind},
+        },
+        tensor::{TensorFormat, TensorFormatKind},
+    };
+
     let img_path = match std::env::args().nth(1) {
         Some(path) => path,
         None => {
@@ -60,18 +64,28 @@ fn main() {
 
     let model = get_rknn(0);
 
-    let mut input = TensorBuilder::new_input(&model, 0)
-        .allocate::<i8>()
-        .unwrap();
-    input.copy_data(&quantized_input).unwrap();
+    let input = Input::new(
+        0,
+        BufView::I8(&quantized_input),
+        true,
+        TensorFormatKind::NCHW(TensorFormat::NCHW),
+    );
 
-    model.set_inputs(&[input]).unwrap();
+    model.set_inputs(input).unwrap();
     model.run().unwrap();
 
-    let mut outputs = model.get_outputs().unwrap();
-    let output = <TensorT as TryInto<Tensor<i8>>>::try_into(outputs.remove(0)).unwrap();
-    let output = output.as_slice();
-    let logits = dequantize_output(output, OUTPUT_SCALE);
+    let mut logits = vec![0.0f32; 1000];
+
+    let output = Output {
+        index: 0,
+        kind: OutputKind::Preallocated {
+            buf: BufMutView::F32(&mut logits),
+            want_float: true,
+        },
+    };
+
+    model.get_outputs(&mut vec![output]).unwrap();
+
     let softmax_output = softmax(&logits);
     let top5 = softmax_output
         .into_iter()
@@ -130,10 +144,6 @@ fn softmax(logits: &[f32]) -> Vec<f32> {
     let exp: Vec<f32> = logits.iter().map(|&x| (x - max).exp()).collect();
     let sum: f32 = exp.iter().sum();
     exp.into_iter().map(|x| x / sum).collect()
-}
-
-fn dequantize_output(output: &[i8], scale: f32) -> Vec<f32> {
-    output.iter().map(|&x| x as f32 * scale).collect()
 }
 
 #[cfg(not(any(feature = "rk3576", feature = "rk35xx")))]

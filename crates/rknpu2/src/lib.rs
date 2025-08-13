@@ -10,6 +10,9 @@ pub mod query;
 /// Main RKNN struct
 pub mod rknn;
 
+/// Input and output types
+pub mod io;
+
 /// Tensor types
 pub mod tensor;
 
