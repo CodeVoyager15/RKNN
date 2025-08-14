@@ -1,0 +1,8 @@
+[package]
+name = "rktensor"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+half = { workspace = true }
+image = "0.25.6"

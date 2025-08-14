@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/rknpu2", "crates/rknpu2-sys"]
+members = ["crates/rknpu2", "crates/rknpu2-sys", "crates/rktensor"]
 resolver = "3"
 
 [workspace.dependencies]
