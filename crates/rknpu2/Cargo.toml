@@ -1,6 +1,6 @@
 [package]
 name = "rknpu2"
-version = "0.0.6"
+version = "0.0.7"
 edition = "2024"
 description = "Unofficial bindings to rknpu2 (librknnrt and librknnmrt)"
 repository = "https://github.com/boundarybitlabs/rknpu2-rs"
