@@ -2,6 +2,10 @@
 name = "rktensor"
 version = "0.0.1"
 edition = "2024"
+description = "Flat tensor utilities for rknpu2-rs"
+repository = "https://github.com/boundarybitlabs/rknpu2-rs"
+license = "MIT OR Apache-2.0"
+documentation = "https://docs.rs/rktensor"
 
 [dependencies]
 half = { workspace = true }
