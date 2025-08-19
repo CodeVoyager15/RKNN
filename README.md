@@ -1,6 +1,6 @@
-# rknpu2-rs
+# RKNN
 
-Rust bindings for the [Rockchip RKNN API (rknpu2)](https://github.com/airockchip/rknn-toolkit2), targeting deployment of deep learning models on Rockchip NPUs.
+Rust bindings for the Rockchip RKNN Runtime API (librknnrt.so), enabling deployment of deep learning models on Rockchip NPUs. This library is a key component of the rknpu2 SDK, providing efficient integration between Rust applications and Rockchip's neural processing unit for optimized AI model execution.
 
 > These bindings do **not** require redistributing the C headers from the Rockchip rknpu2 SDK. The sys crate contains bindgen bindings, but bindgen is not part of the build process.
 
@@ -11,7 +11,7 @@ This crate provides safe, idiomatic Rust abstractions over the Rockchip RKNN run
 ## Requirements
 
 - Rockchip NPU compatible with `librknnrt` or `librknnmrt` libraries
-- Rust 1.70+ 
+- Rust 1.70+ (edition 2021)
 - Linux environment (primary target)
 - Supported NPU families: RK35xx, RK3576, and others compatible with RKNN API v2.3.2
 
@@ -25,6 +25,17 @@ This crate provides safe, idiomatic Rust abstractions over the Rockchip RKNN run
 - **Comprehensive Querying**: Access model metadata, tensor attributes, and performance information
 - **Multi-format Support**: Handle various tensor formats (NCHW, NHWC) and data types
 - **Production Ready**: Based on the stable **rknpu2 SDK v2.3.2**
+- **Comprehensive Error Handling**: Custom error types with detailed error information
+- **Memory-safe Operations**: Safe tensor operations and buffer management
+
+## Project Structure
+
+```
+crates/
+├── rknpu2/          # High-level Rust API wrapper
+├── rknpu2-sys/      # Low-level FFI bindings
+└── rktensor/        # Tensor operations and utilities
+```
 
 ## Installation
 
@@ -98,6 +109,10 @@ cargo run --example mobilenet --features "rk35xx,libloading"
 3. **Model Format**: Ensure your model is in the correct RKNN format
 4. **Memory Alignment**: Check that input/output buffers meet alignment requirements
 
+## Development Status
+
+This project is actively maintained and follows Rust best practices. Contributions are welcome!
+
 ## Contributing
 
 Contributions are welcome! Please see our contributing guidelines for:
@@ -106,20 +121,6 @@ Contributions are welcome! Please see our contributing guidelines for:
 - Testing requirements
 - Documentation standards
 - Feature request process
-
-## License
-
-This project is licensed under either of:
-
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE))
-- MIT License ([LICENSE-MIT](LICENSE-MIT))
-
-at your option.
-
-## Version Compatibility
-
-These bindings are aligned with the **2.3.2** release of the RKNN API.
-[rknn C API v2.3.2 PDF](https://github.com/airockchip/rknn-toolkit2/blob/42aa1d426c0a9e0869b6374edba009f7208a1926/doc/04_Rockchip_RKNPU_API_Reference_RKNNRT_V2.3.2_EN.pdf)
 
 ## Related Projects
 
@@ -135,3 +136,12 @@ For issues and questions:
 - Review the [API documentation](https://docs.rs/rknpu2)
 - Open an issue on GitHub
 - Consult the [RKNN API reference](https://github.com/airockchip/rknn-toolkit2)
+
+## License
+
+This project is licensed under either of:
+
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE))
+- MIT License ([LICENSE-MIT](LICENSE-MIT))
+
+at your option.
