@@ -5,6 +5,7 @@ edition = "2024"
 description = "Unofficial bindings to rknpu2 (librknnrt and librknnmrt)"
 repository = "https://github.com/boundarybitlabs/rknpu2-rs"
 license = "MIT OR Apache-2.0"
+documentation = "https://docs.rs/rknpu2"
 
 [dependencies]
 half = { workspace = true }

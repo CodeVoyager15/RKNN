@@ -1,10 +1,11 @@
 [package]
 name = "rknpu2-sys"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2024"
 description = "Unofficial bindings to rknpu2 (librknnrt and librknnmrt)"
 repository = "https://github.com/boundarybitlabs/rknpu2-rs"
 license = "MIT OR Apache-2.0"
+documentation = "https://docs.rs/rknpu2-sys"
 
 [dependencies]
 libloading = { version = "0.8.8", optional = true }
