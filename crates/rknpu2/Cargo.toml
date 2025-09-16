@@ -1,38 +1,47 @@
 [package]
-name = "rknpu2"
-version = "0.0.7"
-edition = "2024"
-description = "Unofficial bindings to rknpu2 (librknnrt and librknnmrt)"
-repository = "https://github.com/boundarybitlabs/rknpu2-rs"
-license = "MIT OR Apache-2.0"
-documentation = "https://docs.rs/rknpu2"
+name = "rknpu2"                       # Crate name (used in Cargo and crates.io)
+version = "0.0.7"                     # Crate version
+edition = "2024"                      # Rust edition to use (2024 edition features)
+description = "Unofficial bindings..."# Short summary shown on crates.io
+repository = "https://github.com/..." # Source code repository
+license = "MIT OR Apache-2.0"         # Dual license, common for Rust projects
+documentation = "https://docs.rs/..." # Auto-generated documentation on docs.rs
 
 [dependencies]
-half = { workspace = true }
-rknpu2-sys = "0.0.1"
+half = { workspace = true }           # Use the 'half' crate (for f16 floats),
+                                      # but pull version from workspace root
+rknpu2-sys = "0.0.1"                  # Low-level FFI bindings to Rockchip's
+                                      # rknnrt and rknnmrt C libraries
 
 [features]
-default = []
+default = []                          # No features enabled by default
 
-rv110x = ["rknpu2-sys/rv110x"] # For RV1103 / RV1106 / B variants
-rk2118 = ["rknpu2-sys/rk2118"] # For RK2118
-rk35xx = ["rknpu2-sys/rk35xx"] # For RK356x / RV1126B
-rk3576 = [
-    "rknpu2-sys/rk3576",
-] # For RK3576 / RK3588 with full multi-core support
+# Feature flags for selecting which Rockchip NPU chip family to target.
+rv110x = ["rknpu2-sys/rv110x"]        # For RV1103 / RV1106 / B series chips
+rk2118 = ["rknpu2-sys/rk2118"]        # For RK2118 chips
+rk35xx = ["rknpu2-sys/rk35xx"]        # For RK356x / RV1126B chips
+rk3576 = ["rknpu2-sys/rk3576"]        # For RK3576 / RK3588 with full multi-core NPU
+
+# A "meta feature" used only when building documentation on docs.rs.
+# It enables all chip features + libloading, so that the docs show the full API,
+# regardless of which chip a user is actually building for.
 docs = [
     "rv110x",
     "rk2118",
     "rk35xx",
     "rk3576",
     "libloading",
-] # Requires nightly compiler
+]
+
+# Optional feature to load NPU libraries dynamically at runtime
+# (via the libloading crate, re-exposed by rknpu2-sys).
 libloading = ["rknpu2-sys/libloading"]
 
 [dev-dependencies]
-image = "0.25.6"
-itertools = "0.14.0"
+image = "0.25.6"                      # Used in tests/examples for working with images
+itertools = "0.14.0"                  # Extra iterator utilities for test/example code
 
 [package.metadata.docs.rs]
-features = ["docs"]
-rustc-args = ["--cfg", "docsrs"]
+features = ["docs"]                   # When building on docs.rs, enable the `docs` feature
+rustc-args = ["--cfg", "docsrs"]      # Pass a compiler cfg flag (`docsrs`) so the crate
+                                      # can detect it’s being built for docs.rs
